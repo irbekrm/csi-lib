@@ -381,6 +381,7 @@ func (m *Manager) issue(ctx context.Context, volumeID string) error {
 			if isApproved {
 				lastFailureReason = fmt.Sprintf("request %q has no ready condition", updatedReq.Name)
 			}
+			log.Info("ready condition not applied")
 			return false, nil
 		}
 
@@ -390,6 +391,7 @@ func (m *Manager) issue(ctx context.Context, volumeID string) error {
 		case cmapi.CertificateRequestReasonFailed:
 			return false, fmt.Errorf("request %q has failed: %s", updatedReq.Name, readyCondition.Message)
 		case cmapi.CertificateRequestReasonPending:
+			log.Info("Request is pending")
 			if isApproved {
 				lastFailureReason = fmt.Sprintf("request %q is pending: %v", updatedReq.Name, readyCondition.Message)
 			}
@@ -447,6 +449,8 @@ func (m *Manager) cleanupStaleRequests(ctx context.Context, log logr.Logger, vol
 	if len(reqs) < m.maxRequestsPerVolume {
 		return nil
 	}
+
+	log.Info("LINE 453", "len reqs", len(reqs), "max", m.maxRequestsPerVolume, "volumeID", volumeID, "reqs", reqs)
 
 	// sort newest first to oldest last
 	sort.Slice(reqs, func(i, j int) bool {
