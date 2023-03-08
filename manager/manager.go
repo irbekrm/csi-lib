@@ -447,7 +447,7 @@ func (m *Manager) cleanupStaleRequests(ctx context.Context, log logr.Logger, vol
 		return fmt.Errorf("listing certificaterequests: %w", err)
 	}
 
-	if len(reqs) < m.maxRequestsPerVolume {
+	if len(reqs) <= m.maxRequestsPerVolume {
 		return nil
 	}
 
